@@ -1,5 +1,5 @@
 {
-    "name": "swoole/ide-helper",
+    "name": "easyswoole/swoole-ide-helper",
     "type": "library",
     "description": "IDE help files for Swoole.",
     "license": "Apache-2.0",
