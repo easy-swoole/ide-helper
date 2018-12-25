@@ -8,6 +8,5 @@
             "name": "Team Swoole",
             "email": "team@swoole.com"
         }
-    ],
-    "require": {}
+    ]
 }
