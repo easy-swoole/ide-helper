@@ -1,18 +1,19 @@
 <?php
 namespace Swoole\Coroutine;
 
-class Iterator extends \ArrayIterator
+class Context extends \ArrayObject
 {
     const STD_PROP_LIST = 1;
     const ARRAY_AS_PROPS = 2;
 
 
     /**
-     * @param $array[optional]
-     * @param $ar_flags[optional]
+     * @param $input[optional]
+     * @param $flags[optional]
+     * @param $iterator_class[optional]
      * @return mixed
      */
-    public function __construct($array=null, $ar_flags=null){}
+    public function __construct($input=null, $flags=null, $iterator_class=null){}
 
     /**
      * @param $index[required]
@@ -112,33 +113,24 @@ class Iterator extends \ArrayIterator
     /**
      * @return mixed
      */
-    public function rewind(){}
+    public function getIterator(){}
+
+    /**
+     * @param $array[required]
+     * @return mixed
+     */
+    public function exchangeArray($array){}
+
+    /**
+     * @param $iteratorClass[required]
+     * @return mixed
+     */
+    public function setIteratorClass($iteratorClass){}
 
     /**
      * @return mixed
      */
-    public function current(){}
-
-    /**
-     * @return mixed
-     */
-    public function key(){}
-
-    /**
-     * @return mixed
-     */
-    public function next(){}
-
-    /**
-     * @return mixed
-     */
-    public function valid(){}
-
-    /**
-     * @param $position[required]
-     * @return mixed
-     */
-    public function seek($position){}
+    public function getIteratorClass(){}
 
 
 }

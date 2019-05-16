@@ -1,5 +1,5 @@
 <?php
-namespace Swoole\Coroutine\Socket;
+namespace Swoole\Coroutine\Http2\Client;
 
 class Exception extends \Swoole\Exception
 {
