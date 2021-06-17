@@ -7,6 +7,12 @@ class Socket
 
     public $fd = -1;
 
+    public $domain = 0;
+
+    public $type = 0;
+
+    public $protocol = 0;
+
     public $errCode = 0;
 
     public $errMsg = '';
@@ -46,7 +52,42 @@ class Socket
     /**
      * @return mixed
      */
+    public function checkLiveness()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function peek($length = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function recv($length = null, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function recvAll($length = null, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function recvLine($length = null, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function recvWithBuffer($length = null, $timeout = null)
     {
     }
 
@@ -67,14 +108,35 @@ class Socket
     /**
      * @return mixed
      */
-    public function sendFile($filename, $offset = null, $length = null)
+    public function readVector($io_vector, $timeout = null)
     {
     }
 
     /**
      * @return mixed
      */
-    public function recvAll($length = null, $timeout = null)
+    public function readVectorAll($io_vector, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function writeVector($io_vector, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function writeVectorAll($io_vector, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function sendFile($filename, $offset = null, $length = null)
     {
     }
 
@@ -117,6 +179,13 @@ class Socket
      * @return mixed
      */
     public function setOption($level, $opt_name, $opt_value)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function sslHandshake()
     {
     }
 

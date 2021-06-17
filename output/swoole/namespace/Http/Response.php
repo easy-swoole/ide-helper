@@ -7,13 +7,13 @@ class Response
 
     public $fd = 0;
 
-    public $socket = null;
+    public $socket;
 
-    public $header = null;
+    public $header;
 
-    public $cookie = null;
+    public $cookie;
 
-    public $trailer = null;
+    public $trailer;
 
     /**
      * @return mixed
@@ -25,21 +25,28 @@ class Response
     /**
      * @return mixed
      */
-    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
+    public function isWritable()
     {
     }
 
     /**
      * @return mixed
      */
-    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
+    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null, $priority = null)
     {
     }
 
     /**
      * @return mixed
      */
-    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null)
+    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null, $priority = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null, $priority = null)
     {
     }
 
@@ -60,14 +67,14 @@ class Response
     /**
      * @return mixed
      */
-    public function header($key, $value, $ucwords = null)
+    public function header($key, $value, $format = null)
     {
     }
 
     /**
      * @return mixed
      */
-    public function setHeader($key, $value, $ucwords = null)
+    public function setHeader($key, $value, $format = null)
     {
     }
 
@@ -82,6 +89,13 @@ class Response
      * @return mixed
      */
     public function ping()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function goaway()
     {
     }
 
@@ -123,7 +137,7 @@ class Response
     /**
      * @return mixed
      */
-    public static function create($fd)
+    public static function create($server, $fd = null)
     {
     }
 
@@ -137,7 +151,7 @@ class Response
     /**
      * @return mixed
      */
-    public function push()
+    public function push($data, $opcode = null, $flags = null)
     {
     }
 
@@ -145,6 +159,13 @@ class Response
      * @return mixed
      */
     public function recv()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function close()
     {
     }
 

@@ -13,17 +13,17 @@ class Client
 
     public $type = 0;
 
-    public $setting = null;
+    public $setting;
 
     public $connected = false;
 
-    public $host = null;
+    public $host;
 
     public $port = 0;
 
     public $ssl = false;
 
-    public function __construct($host, $port = null, $ssl = null)
+    public function __construct($host, $port = null, $open_ssl = null)
     {
     }
 
@@ -77,6 +77,13 @@ class Client
      * @return mixed
      */
     public function recv($timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function read($timeout = null)
     {
     }
 

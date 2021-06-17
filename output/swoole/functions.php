@@ -42,17 +42,19 @@ function swoole_coroutine_create($func, $params = null){}
 function swoole_coroutine_defer($callback){}
 
 /**
- * @param $func[required]
- * @param $params[optional]
+ * @param $domain[required]
+ * @param $type[required]
+ * @param $protocol[required]
  * @return mixed
  */
-function go($func, $params = null){}
+function swoole_coroutine_socketpair($domain, $type, $protocol){}
 
 /**
- * @param $callback[required]
+ * @param $count[optional]
+ * @param $sleep_time[optional]
  * @return mixed
  */
-function defer($callback){}
+function swoole_test_kernel_coroutine($count = null, $sleep_time = null){}
 
 /**
  * @param $read_array[required]
@@ -101,11 +103,49 @@ function swoole_strerror($errno, $error_type = null){}
 function swoole_errno(){}
 
 /**
+ * @return mixed
+ */
+function swoole_clear_error(){}
+
+/**
+ * @param $level[required]
+ * @param $msg[required]
+ * @return mixed
+ */
+function swoole_error_log($level, $msg){}
+
+/**
  * @param $data[required]
  * @param $type[optional]
  * @return mixed
  */
 function swoole_hashcode($data, $type = null){}
+
+/**
+ * @param $suffix[required]
+ * @param $mime_type[required]
+ * @return mixed
+ */
+function swoole_mime_type_add($suffix, $mime_type){}
+
+/**
+ * @param $suffix[required]
+ * @param $mime_type[required]
+ * @return mixed
+ */
+function swoole_mime_type_set($suffix, $mime_type){}
+
+/**
+ * @param $suffix[required]
+ * @return mixed
+ */
+function swoole_mime_type_delete($suffix){}
+
+/**
+ * @param $filename[required]
+ * @return mixed
+ */
+function swoole_mime_type_get($filename){}
 
 /**
  * @param $filename[required]
@@ -114,14 +154,57 @@ function swoole_hashcode($data, $type = null){}
 function swoole_get_mime_type($filename){}
 
 /**
+ * @param $filename[required]
+ * @return mixed
+ */
+function swoole_mime_type_exists($filename){}
+
+/**
+ * @return mixed
+ */
+function swoole_mime_type_list(){}
+
+/**
  * @return mixed
  */
 function swoole_clear_dns_cache(){}
 
 /**
+ * @param $str[required]
+ * @param $offset[required]
+ * @param $length[optional]
+ * @param $options[optional]
+ * @return mixed
+ */
+function swoole_substr_unserialize($str, $offset, $length = null, $options = null){}
+
+/**
+ * @param $json[required]
+ * @param $offset[required]
+ * @param $length[optional]
+ * @param $associative[optional]
+ * @param $depth[optional]
+ * @param $flags[optional]
+ * @return mixed
+ */
+function swoole_substr_json_decode($json, $offset, $length = null, $associative = null, $depth = null, $flags = null){}
+
+/**
  * @return mixed
  */
 function swoole_internal_call_user_shutdown_begin(){}
+
+/**
+ * @param $func[required]
+ * @return mixed
+ */
+function go($func){}
+
+/**
+ * @param $callback[required]
+ * @return mixed
+ */
+function defer($callback){}
 
 /**
  * @param $fd[required]
