@@ -5,19 +5,19 @@ namespace Swoole;
 class Client
 {
 
-    const MSG_OOB = 1;
+    public const MSG_OOB = 1;
 
-    const MSG_PEEK = 2;
+    public const MSG_PEEK = 2;
 
-    const MSG_DONTWAIT = 64;
+    public const MSG_DONTWAIT = 64;
 
-    const MSG_WAITALL = 256;
+    public const MSG_WAITALL = 256;
 
-    const SHUT_RDWR = 2;
+    public const SHUT_RDWR = 2;
 
-    const SHUT_RD = 0;
+    public const SHUT_RD = 0;
 
-    const SHUT_WR = 1;
+    public const SHUT_WR = 1;
 
     public $errCode = 0;
 
@@ -29,25 +29,11 @@ class Client
 
     public $type = 0;
 
-    public $id = null;
+    public $id;
 
-    public $setting = null;
+    public $setting;
 
-    private $onConnect = null;
-
-    private $onError = null;
-
-    private $onReceive = null;
-
-    private $onClose = null;
-
-    private $onBufferFull = null;
-
-    private $onBufferEmpty = null;
-
-    private $onSSLReady = null;
-
-    public function __construct($type, $async = null)
+    public function __construct($type, $async = null, $id = null)
     {
     }
 
@@ -86,13 +72,6 @@ class Client
     /**
      * @return mixed
      */
-    public function pipe($dst_socket)
-    {
-    }
-
-    /**
-     * @return mixed
-     */
     public function sendfile($filename, $offset = null, $length = null)
     {
     }
@@ -107,34 +86,6 @@ class Client
     /**
      * @return mixed
      */
-    public function sleep()
-    {
-    }
-
-    /**
-     * @return mixed
-     */
-    public function wakeup()
-    {
-    }
-
-    /**
-     * @return mixed
-     */
-    public function pause()
-    {
-    }
-
-    /**
-     * @return mixed
-     */
-    public function resume()
-    {
-    }
-
-    /**
-     * @return mixed
-     */
     public function shutdown($how)
     {
     }
@@ -142,7 +93,7 @@ class Client
     /**
      * @return mixed
      */
-    public function enableSSL(callable $callback = null)
+    public function enableSSL()
     {
     }
 
@@ -185,13 +136,6 @@ class Client
      * @return mixed
      */
     public function close($force = null)
-    {
-    }
-
-    /**
-     * @return mixed
-     */
-    public function on($event_name, callable $callback)
     {
     }
 

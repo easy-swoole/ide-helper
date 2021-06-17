@@ -9,19 +9,19 @@ class Request
 
     public $streamId = 0;
 
-    public $header = null;
+    public $header;
 
-    public $server = null;
+    public $server;
 
-    public $cookie = null;
+    public $cookie;
 
-    public $get = null;
+    public $get;
 
-    public $files = null;
+    public $files;
 
-    public $post = null;
+    public $post;
 
-    public $tmpfiles = null;
+    public $tmpfiles;
 
     /**
      * @return mixed
@@ -33,7 +33,42 @@ class Request
     /**
      * @return mixed
      */
+    public function getContent()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function getData()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function create($options = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function parse($data)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isCompleted()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMethod()
     {
     }
 

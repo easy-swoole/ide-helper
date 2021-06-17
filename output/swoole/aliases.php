@@ -3,6 +3,7 @@
 class_alias(Swoole\Coroutine\Channel::class, Co\Channel::class);
 class_alias(Swoole\Coroutine\Client::class, Co\Client::class);
 class_alias(Swoole\Coroutine\Context::class, Co\Context::class);
+class_alias(Swoole\Coroutine\Curl\Exception::class, Co\Curl\Exception::class);
 class_alias(Swoole\Coroutine\Http2\Client::class, Co\Http2\Client::class);
 class_alias(Swoole\Coroutine\Http2\Client\Exception::class, Co\Http2\Client\Exception::class);
 class_alias(Swoole\Coroutine\Http\Client::class, Co\Http\Client::class);
@@ -20,7 +21,6 @@ class_alias(Swoole\Coroutine\System::class, Co\System::class);
 
 class_alias(Swoole\Atomic::class, swoole_atomic::class);
 class_alias(Swoole\Atomic\Long::class, swoole_atomic_long::class);
-class_alias(Swoole\Buffer::class, swoole_buffer::class);
 class_alias(Swoole\Client::class, swoole_client::class);
 class_alias(Swoole\Connection\Iterator::class, swoole_connection_iterator::class);
 class_alias(Swoole\Coroutine::class, co::class);

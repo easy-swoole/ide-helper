@@ -5,8 +5,6 @@ namespace Swoole\Coroutine;
 class Scheduler
 {
 
-    private $_list = null;
-
     /**
      * @return mixed
      */
@@ -25,6 +23,13 @@ class Scheduler
      * @return mixed
      */
     public function set(array $settings)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOptions()
     {
     }
 
