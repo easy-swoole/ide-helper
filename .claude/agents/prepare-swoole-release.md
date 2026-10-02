@@ -158,9 +158,9 @@ over time, and a summary here would only drift out of sync with it. That section
 `@pseudocode-included`, `{@inheritDoc}` for re-listed inherited methods, Markdown-fenced example code instead of
 `@example`, the completeness/typing baseline (accurate native types on touched properties/parameters/returns,
 matching `@param`/`@return` tags, a real one-line description for every property/constant/method/function you touch
-regardless of visibility — tags-only or bare `{@inheritDoc}` docblocks don't count), the PHP-8.1-only inline-type
-constraint (no standalone `true`/`false`/`null` or DNF types), build-flag-gated symbol documentation, tag grouping,
-and cross-referencing.
+regardless of visibility — tags-only or bare `{@inheritDoc}` docblocks don't count), the minimum-PHP inline-syntax
+constraint (nothing the branch's minimum PHP version can't parse, e.g. no typed class constants or property hooks
+with an 8.2 minimum), build-flag-gated symbol documentation, tag grouping, and cross-referencing.
 
 Beyond that general checklist, a version bump specifically also requires:
 - **`@see` tags pointing at a specific swoole-src line for the previously supported version** — update both the tag
@@ -203,15 +203,27 @@ Follow CLAUDE.md's "README maintenance" section — re-read it fresh, like the s
 3. **Inventory.** If Step 3 added or removed a top-level file under `src/swoole/`, changed how `src/swoole_library/`
    is shipped, or added/removed/renamed a build option, update "What's included" / "Features that depend on build
    options" to match.
+4. **Minimum PHP version.** Read the `#if PHP_VERSION_ID < ...` / `#error "require PHP version X.Y or later"` check
+   in `ext-src/php_swoole_private.h` at `vTARGET_VERSION` (cross-check `package.xml`'s `<min>`). If it differs from
+   CLAUDE.md's "Minimum supported PHP version on this branch", update everything that depends on it together, and
+   call it out in the commit body: that CLAUDE.md fact and the "Inline declarations must be valid PHP X.Y syntax"
+   convention (including its examples of what is and isn't allowed), the syntax-check image in CLAUDE.md's
+   "Commands", the PHP matrix in `.github/workflows/syntax_checks.yml` (drop versions below the new minimum, and add
+   any newer PHP version swoole-src now supports), README's `php-requirements` block (including which older release
+   line to use on an older PHP version) and its "Contributing" bullet and `phplint` image, and the version numbers in
+   both agents' syntax-check guidance. Then re-check the stubs for declarations the new minimum newly allows (e.g. a
+   type swoole-src's arginfo declares that the old minimum couldn't parse). Don't touch `composer.json`: this package
+   deliberately declares no PHP requirement.
 
-Do not rewrite any other part of `README.md`, and do not reword entries that are still correct. If nothing needed
+Outside those derived parts, do not rewrite any part of `README.md`, and do not reword entries that are still
+correct. If nothing needed
 to change, say so explicitly in the commit body and report rather than staying silent.
 
 # Step 5: verify before you're done
 
 Run this repo's own CI-equivalent checks and fix anything they flag. Take the exact commands from CLAUDE.md's
 "Commands" section rather than from memory or from a copy pasted here — that section is the single source of truth
-for them and it explains, among other things, why the syntax check runs against the `php8.1-alpine` image
+for them and it explains, among other things, why the syntax check runs against the `php8.2-alpine` image
 specifically. You need three of the commands documented there: the coding-style dry run, the coding-style auto-fix
 (for anything the dry run flags — don't hand-fix formatting the fixer will do for you), and the syntax check.
 

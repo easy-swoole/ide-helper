@@ -74,8 +74,14 @@ composer require --dev swoole/ide-helper:dev-master
 
 ## Requirements
 
-The stubs use PHP 8.1 syntax in their type declarations and are checked against PHP 8.1 through 8.5 in CI. Set your
-IDE's or static analyzer's PHP language level to 8.1 or later so it can parse them.
+<!-- BEGIN: php-requirements -->
+Swoole 6.2 requires PHP 8.2 or later, and so do these stubs: they use PHP 8.2 syntax in their declarations and are
+checked against PHP 8.2 through 8.5 in CI. Set your IDE's or static analyzer's PHP language level to 8.2 or later so
+it can parse them.
+
+If you're on PHP 8.1 (and therefore on Swoole 6.1 or older), use the matching older release line of this package
+instead, e.g. `composer require --dev swoole/ide-helper:~6.1.10`.
+<!-- END: php-requirements -->
 
 ## IDE and tool setup
 
@@ -204,14 +210,14 @@ Bug reports and pull requests are welcome. If a stub doesn't match Swoole, pleas
   they aren't reliable for this work.
 * Don't hand-edit `src/swoole_library/`; it's copied from the matching [swoole/library](https://github.com/swoole/library)
   release.
-* Inline type declarations must be valid PHP 8.1 syntax.
+* Inline declarations must be valid PHP 8.2 syntax (the minimum PHP version Swoole 6.2 supports).
 * Before submitting, run the same checks as CI:
 
   ```bash
   # Coding style.
   docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.5-alpine php-cs-fixer fix --dry-run
-  # Syntax, under the oldest supported PHP version (newer versions accept syntax that PHP 8.1 rejects).
-  docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.1-alpine phplint src
+  # Syntax, under the oldest supported PHP version (newer versions accept syntax that PHP 8.2 rejects).
+  docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.2-alpine phplint src
   ```
 
 The full set of stub-writing conventions is in

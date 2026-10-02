@@ -34,6 +34,14 @@ Layout inside `src/swoole/`:
 There is no local PHP toolchain expected to be installed (`composer.json` declares no dependencies). CI and local
 checks both run through the `jakzal/phpqa` Docker image.
 
+**Minimum supported PHP version on this branch: 8.2.** It mirrors the minimum PHP version Swoole itself enforces at
+build time — the `#if PHP_VERSION_ID < 80200` / `#error "require PHP version 8.2 or later"` check in
+`ext-src/php_swoole_private.h` at the swoole-src tag this branch supports (`package.xml`'s `<min>` should agree).
+Everything below that depends on it must match it: the oldest entry of the PHP matrix in
+`.github/workflows/syntax_checks.yml`, the image of the syntax-check command below, the "Inline declarations"
+convention, and the README parts listed under "README maintenance". Maintenance branches keep their own value (e.g.
+`6.1.x` supports PHP 8.1, since Swoole 6.1 does), so never copy this value across branches.
+
 Check coding style (dry run, matches CI):
 ```bash
 docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.5-alpine php-cs-fixer fix --dry-run
@@ -44,15 +52,16 @@ Auto-fix coding style:
 docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.5-alpine php-cs-fixer fix
 ```
 
-Check PHP syntax (CI runs this for 8.1, 8.2, 8.3, 8.4, and 8.5 — see `.github/workflows/syntax_checks.yml`):
+Check PHP syntax (CI runs this for 8.2, 8.3, 8.4, and 8.5 — see `.github/workflows/syntax_checks.yml`):
 ```bash
-docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.1-alpine phplint src
+docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.2-alpine phplint src
 ```
 
-Locally, run the syntax check against `php8.1-alpine` specifically. PHP's parser is backward-permissive: a construct
-only PHP 8.2+ understands (a standalone `false` type, a DNF type) parses fine under 8.5 but fails under 8.1, so 8.1 is
-the only version whose parser actually enforces the "inline type declarations must be valid PHP 8.1 syntax"
-convention below. Swap the version segment of the image tag to check any other supported version.
+Locally, run the syntax check against `php8.2-alpine` (the minimum supported version) specifically. PHP's parser is
+backward-permissive: a construct only PHP 8.3+ understands (e.g., a typed class constant) parses fine under 8.5 but
+fails under 8.2, so 8.2 is the only version whose parser actually enforces the "inline declarations must be valid
+PHP 8.2 syntax" convention below. Swap the version segment of the image tag to check any other supported
+version.
 
 There is no test suite — correctness here means "the stub's signature/docblock matches upstream Swoole," not
 behavior, since no method body ever executes.
@@ -92,14 +101,18 @@ conventions consistently — they are what every existing file already follows a
   PHPDoc tag, since the tag is what carries the description. When reviewing a file, treat an undocumented,
   annotations-only, or untyped-but-present member exactly like a missing one: it still needs to be fixed, not
   skipped because "it's already there."
-- **Inline type declarations must be valid PHP 8.1 syntax.** This project supports PHP 8.1+ (see the syntax-check
-  command above, which CI runs against 8.1 through 8.5), so a native type declaration that only PHP 8.2+ understands
-  — a standalone `true`/`false`/`null` type, or a DNF (disjunctive normal form) type like `(A&B)|C` — would break on
-  the oldest supported version and must never be used inline. When swoole-src's real, fully-accurate type needs one
-  of those constructs, fall back to the closest PHP-8.1-compatible native type instead (e.g., `bool` in place of a
-  standalone `false`), or omit the native type declaration entirely if nothing 8.1-compatible fits, and document the
-  precise type via a `@param`/`@return` tag instead — PHPDoc's type syntax isn't constrained by what a given PHP
-  version can parse inline.
+- **Inline declarations must be valid PHP 8.2 syntax** (this branch's minimum supported PHP version; see
+  "Commands" above). PHP 8.2's own type syntax is fine to use whenever it's the accurate type: a standalone
+  `true`/`false`/`null` type (e.g., `?false` for `Swoole\Process\Pool::start()`), or a DNF (disjunctive normal form)
+  type like `(A&B)|C`. What must never be used inline is anything only PHP 8.3+ understands — e.g., a typed class
+  constant (`const string FOO = ...`, PHP 8.3), or a property hook or asymmetric visibility
+  (`public private(set) int $x`, PHP 8.4) — since it would break on the oldest supported version. When swoole-src's
+  real, fully-accurate type needs such a construct, fall back to the closest PHP-8.2-compatible native declaration
+  instead, or omit the native declaration entirely if nothing 8.2-compatible fits, and document the precise type via
+  a `@param`/`@return`/`@var` tag instead — PHPDoc's type syntax isn't constrained by what a given PHP version can
+  parse inline. The same goes for attributes: one PHP 8.2 understands (e.g., `#[\SensitiveParameter]`, which
+  swoole-src puts on the `$password` parameter of `Swoole\Coroutine\Http\Client::setBasicAuth()`) should be
+  mirrored when swoole-src declares it, while newer ones are covered by the `@deprecated` rule below.
 - **New class/method/function/constant**: add an `@since X.Y.Z` tag (see existing usage in `functions.php` and
   `constants.php` for the exact placement — as a PHPDoc tag for methods/functions/classes, or as a trailing
   `// @since X.Y.Z` line comment for `define()` constants). Write the version bare, with no `v` prefix
@@ -112,8 +125,8 @@ conventions consistently — they are what every existing file already follows a
   for classes/methods/functions, or a trailing `// @deprecated X.Y.Z ...` line comment for `define()` constants) —
   plus a `@see` tag pointing at the replacement, so a reader lands on the alternative regardless of which symbol they
   open first (see `Swoole\Event::rshutdown()` for an existing example). Use the PHPDoc tag, not PHP 8.4's native
-  `#[\Deprecated]` attribute: like the standalone-type/DNF constructs above, that attribute isn't understood by this
-  project's minimum supported version (PHP 8.1), while the PHPDoc tag is version-independent and already understood
+  `#[\Deprecated]` attribute: like the PHP 8.3+ constructs above, that attribute isn't understood by this branch's
+  minimum supported PHP version (8.2), while the PHPDoc tag is version-independent and already understood
   by every IDE/tool this project targets. This is distinct from the "Removed" rule below: only mark something
   `@deprecated` while swoole-src still exports it — once swoole-src actually removes the symbol, delete the stub
   outright instead of leaving a deprecated stub behind.
@@ -182,18 +195,19 @@ conventions consistently — they are what every existing file already follows a
   version bump makes every one of them stale until it's re-checked. When bringing the stubs up to date, grep for
   the previously supported version number across `src/swoole/` and `README.md` and, for each hit, re-verify the
   claim against the new release's source before re-anchoring it to the new version — if the claim no longer holds,
-  rewrite it rather than moving the version number onto a statement that has since become false. This is distinct from prose that
-  deliberately records history (e.g. "Before Swoole 6.2.1, such a path made the method fail with FALSE returned",
-  as used in `Swoole\Coroutine\System`), which stays pinned to the version where the behavior actually changed and
-  must *not* be bumped.
+  rewrite it rather than moving the version number onto a statement that has since become false. This is distinct
+  from prose that deliberately records history (e.g. "Before Swoole 6.2.1, such a path made the method fail with
+  FALSE returned", as used in `Swoole\Coroutine\System`), which stays pinned to the version where the behavior
+  actually changed and must *not* be bumped.
 - After editing, run the coding style and syntax check commands above before committing.
 
 ## README maintenance
 
 `README.md` is mostly hand-written prose, but a few parts of it are derived from swoole-src or from the version this
-branch supports, and go stale on a release exactly like the "as of Swoole X.Y.Z" prose in the stubs. The two
-largest are wrapped in HTML comment markers (`<!-- BEGIN: version-examples -->` … `<!-- END: version-examples -->`
-and `<!-- BEGIN: ini-directives -->` … `<!-- END: ini-directives -->`) to show where automated updates belong:
+branch supports, and go stale on a release exactly like the "as of Swoole X.Y.Z" prose in the stubs. The
+largest are wrapped in HTML comment markers (`<!-- BEGIN: version-examples -->` … `<!-- END: version-examples -->`,
+`<!-- BEGIN: php-requirements -->` … `<!-- END: php-requirements -->`, and `<!-- BEGIN: ini-directives -->` …
+`<!-- END: ini-directives -->`) to show where automated updates belong:
 
 - **Version examples** (inside the `version-examples` markers, e.g. "version `X.Y.Z` of this package documents
   Swoole `vX.Y.Z`", `composer require --dev swoole/ide-helper:~X.Y.Z`, "currently `X.Y.x`"; plus the `vX.Y.Z` tag
@@ -205,6 +219,9 @@ and `<!-- BEGIN: ini-directives -->` … `<!-- END: ini-directives -->`) to show
   `php.ini` only), and the "(as of Swoole X.Y.Z)" note naming the version it was verified against. Describe each
   directive in plain language for a PHP developer, like a stub docblock; don't state a default you can't trace to
   source.
+- **Minimum PHP version** (inside the `php-requirements` markers, plus the "valid PHP X.Y syntax" bullet and the
+  `phplint` image in "Contributing"): must match "Minimum supported PHP version on this branch" in "Commands" above,
+  including the pointer telling users on an older PHP version which release line of this package to use instead.
 - **"What's included" and "Features that depend on build options"**: must still describe what's under `src/` and the
   build-option-gated features documented in the stubs. Update them only when a top-level file or directory is added,
   removed, or changes role, or when a build option is added, removed, or renamed.
