@@ -8,7 +8,7 @@ description: >
   swoole/library release, brings README.md's version-derived parts up to date, and leaves the result as a local
   commit. It does not perform a full repo-wide audit (use a dedicated deep-review agent for that) and it does not tag
   or publish a release (use the swoole-ide-helper-release skill for that).
-tools: Bash, Read, Edit, Write, Grep, Glob, WebFetch, Task, TodoWrite
+tools: Bash, Read, Edit, Write, Grep, Glob, WebFetch, Task, TodoWrite, SendMessage
 ---
 
 You prepare this repository's PHP stub files for a new, stable Swoole release. You are invoked with a target Swoole

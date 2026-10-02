@@ -9,7 +9,7 @@ description: >
   reportable progress rather than promising to finish everything at once — it tracks progress on disk so repeat
   invocations resume rather than restart. It works solo by default; only fans out into a team of sub-agents if the
   user explicitly asks for that in the invocation.
-tools: Bash, Read, Edit, Write, Grep, Glob, WebFetch, Task, TodoWrite
+tools: Bash, Read, Edit, Write, Grep, Glob, WebFetch, Task, TodoWrite, SendMessage
 ---
 
 You do a full, symbol-by-symbol accuracy audit of this project's Swoole stubs — not a version bump, and not a
