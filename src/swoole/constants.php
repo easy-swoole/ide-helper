@@ -389,8 +389,9 @@ define('SWOOLE_IOV_MAX', 1024);
  *     be submitted without a system call, at the cost of keeping that thread running. Its value mirrors the kernel's
  *     IORING_SETUP_SQPOLL setup flag.
  *
- * These two constants are available only when Swoole is installed with the "--enable-iouring" configuration option
- * included (which additionally requires the liburing library to be present).
+ * These two constants are available only on Linux, when Swoole is installed with either the "--enable-iouring"
+ * configuration option or the "--with-liburing-dir" configuration option included (both require the liburing library;
+ * the latter points the build at a liburing installation in a specific directory).
  *
  * @see swoole_async_set()
  * @see https://man7.org/linux/man-pages/man2/io_uring_setup.2.html io_uring_setup(2)
@@ -423,7 +424,7 @@ define('SWOOLE_SPINLOCK', 5); # Supported only if the Spin Locks option is provi
  *   - https://github.com/php/php-src/blob/php-8.1.12/ext/pcntl/pcntl.c#L106
  *
  * Note that values of these constants are not always the same in different operating systems. The values shown here
- * is for Linux only.
+ * are for Linux only.
  */
 // SIG_* constants. Please see your systems signal(7) man page for details of the default behavior of these signals.
 define('SIG_IGN', 1);
@@ -830,7 +831,8 @@ define('SWOOLE_HOOK_STREAM_SELECT', SWOOLE_HOOK_STREAM_FUNCTION);
  * read using the original blocking implementation from PHP.
  *
  * By default the underlying file operations are carried out in a thread pool (function swoole_async_set() is used to
- * size that pool), or through io_uring when Swoole is installed with option "--enable-iouring" included.
+ * size that pool), or through io_uring when Swoole is installed with option "--enable-iouring" (or
+ * "--with-liburing-dir") included.
  *
  * Since Swoole 6.1.2, the same coroutine-friendly file operations can also be requested for one specific file at a
  * time, without enabling this hook flag globally: prefix the file path with the "async.file://" stream protocol
@@ -1075,9 +1077,9 @@ if (class_exists(Swoole\Coroutine\Curl\Exception::class)) { // When Swoole is in
  * Unlike the other SOCKET_E* constants defined earlier in this file, this constant is defined by Swoole even when PHP
  * extension sockets is installed, since that extension does not define it.
  *
- * A typical use case of this constant can be found in class Swoole\Coroutine\Server.
+ * A typical use case of this constant can be found in class \Swoole\Coroutine\Server.
  *
- * @see Swoole\Coroutine\Server::start()
+ * @see \Swoole\Coroutine\Server::start()
  */
 define('SOCKET_ECANCELED', 125);
 
@@ -1256,7 +1258,7 @@ define('SWOOLE_WEBSOCKET_CLOSE_CLOSE_SERVICE_RESTART', 1012); // @since 5.1.2
 define('SWOOLE_WEBSOCKET_CLOSE_TRY_AGAIN_LATER', 1013); // @since 5.1.2
 define('SWOOLE_WEBSOCKET_CLOSE_BAD_GATEWAY', 1014); // @since 5.1.2
 define('SWOOLE_WEBSOCKET_CLOSE_TLS', 1015);
-// Next twelve constants are kept for backward compatibility.
+// Next fifteen constants are kept for backward compatibility.
 define('WEBSOCKET_CLOSE_NORMAL', SWOOLE_WEBSOCKET_CLOSE_NORMAL);
 define('WEBSOCKET_CLOSE_GOING_AWAY', SWOOLE_WEBSOCKET_CLOSE_GOING_AWAY);
 define('WEBSOCKET_CLOSE_PROTOCOL_ERROR', SWOOLE_WEBSOCKET_CLOSE_PROTOCOL_ERROR);
@@ -1292,7 +1294,7 @@ define('SWOOLE_TIMER_MAX_MS', 9223372036854775807);
  * The maximum number of seconds that can be used for time-related operations (e.g., timeout, time intervals, etc) in
  * Swoole. It equals to `(float) SWOOLE_TIMER_MAX_MS / 1000`.
  */
-define('SWOOLE_TIMER_MAX_SEC', (float) (SWOOLE_TIMER_MAX_MS / 1000));
+define('SWOOLE_TIMER_MAX_SEC', (float) SWOOLE_TIMER_MAX_MS / 1000);
 
 /*
  * Constants in this section are for SSL/TLS support. Before Swoole 6.2.0, they were available only when Swoole was
@@ -1300,7 +1302,17 @@ define('SWOOLE_TIMER_MAX_SEC', (float) (SWOOLE_TIMER_MAX_MS / 1000));
  * OpenSSL support is always built in, so these constants are always available (except for the ones tied to a
  * specific SSL/TLS protocol version, which still depend on the OpenSSL library Swoole was compiled against).
  */
+// Socket flag that turns on SSL/TLS encryption, e.g., SWOOLE_SOCK_TCP | SWOOLE_SSL.
 define('SWOOLE_SSL', 512); // 2^9
+/*
+ * SSL/TLS method constants. Each one names an OpenSSL connection method (a protocol version, optionally restricted to
+ * the client or server side). As of Swoole 6.2.3, these constants are still defined but not read by any Swoole
+ * setting or method; to restrict which protocol versions are allowed, use the SWOOLE_SSL_* constants below with
+ * setting "ssl_protocols" instead.
+ *
+ * Constants SWOOLE_TLS_METHOD, SWOOLE_TLS_SERVER_METHOD, and SWOOLE_TLS_CLIENT_METHOD are the newer names of
+ * SWOOLE_SSLv23_METHOD, SWOOLE_SSLv23_SERVER_METHOD, and SWOOLE_SSLv23_CLIENT_METHOD, and share the same values.
+ */
 define('SWOOLE_SSLv3_METHOD', 1);
 define('SWOOLE_SSLv3_SERVER_METHOD', 2);
 define('SWOOLE_SSLv3_CLIENT_METHOD', 3);
@@ -1332,6 +1344,14 @@ define('SWOOLE_TLS_METHOD', 0);
 define('SWOOLE_TLS_SERVER_METHOD', 4);
 define('SWOOLE_TLS_CLIENT_METHOD', 5);
 
+/*
+ * SSL/TLS protocol versions. They are bit flags, combined with the bitwise OR operator (|) to form the value of setting
+ * "ssl_protocols", which lists the protocol versions a server port, client, or coroutine socket accepts, e.g.,
+ * SWOOLE_SSL_TLSv1_2 | SWOOLE_SSL_TLSv1_3.
+ *
+ * @see \Swoole\Server::set()
+ * @see \Swoole\Coroutine\Socket::setProtocol()
+ */
 define('SWOOLE_SSL_SSLv2', 2);
 
 #ifdef HAVE_SSL3

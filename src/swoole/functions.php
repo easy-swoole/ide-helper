@@ -27,8 +27,10 @@ function swoole_cpu_num(): int
 /**
  * Get the error code of the latest failed operation.
  *
- * To translate the error code to an error message, use the following statement:
- *     swoole_strerror(swoole_last_error(), SWOOLE_STRERROR_SWOOLE);
+ * To translate the error code to an error message, pass it to function swoole_strerror(), e.g.,
+ * ```php
+ * swoole_strerror(swoole_last_error(), SWOOLE_STRERROR_SWOOLE);
+ * ```
  *
  * @return int Returns the error code of the latest failed operation.
  * @alias This function has an alias method \Swoole\Server::getLastError().
@@ -271,6 +273,10 @@ function swoole_get_local_mac(): array
 
 /**
  * Get the error message corresponding to the given error code.
+ *
+ * Unless $error_type is SWOOLE_STRERROR_GAI or SWOOLE_STRERROR_DNS, an error code that falls within the range of
+ * Swoole's own error codes (the SWOOLE_ERROR_* constants) always gets Swoole's error message, even when $error_type is
+ * left as SWOOLE_STRERROR_SYSTEM.
  *
  * @param int $errno Error code.
  * @param int $error_type Error type. There are four types of error messages:
@@ -550,9 +556,10 @@ function swoole_internal_call_user_shutdown_begin(): bool
 }
 
 /**
- * Get all PHP objects of current call stack.
+ * Gets all the PHP objects currently alive in the running PHP process (or thread), not just the ones reachable from
+ * the current call stack.
  *
- * @return array|false Return an array of objects back; return FALSE when no objects exist or when error happens.
+ * @return array|false Returns a list of the objects, or FALSE when no object exists at all.
  * @since 4.8.1
  */
 function swoole_get_objects(): array|false
@@ -560,9 +567,10 @@ function swoole_get_objects(): array|false
 }
 
 /**
- * Get status information of current call stack.
+ * Gets the number of PHP objects and resources currently alive in the running PHP process (or thread).
  *
- * @return array The array contains two fields: "object_num" (# of objects) and "resource_num" (# of resources).
+ * @return array The array contains two fields: "object_num" (the number of objects alive) and "resource_num" (the
+ *               number of resources alive).
  * @since 4.8.1
  */
 function swoole_get_vm_status(): array
@@ -573,7 +581,7 @@ function swoole_get_vm_status(): array
  * Get a PHP object by its object handle (the internal ID shown by var_dump() and function spl_object_id()).
  *
  * @param int $handle The object handle.
- * @return object|false Return the specified object back; return FALSE when no object found or when error happens.
+ * @return object|false Returns the object with the given handle, or FALSE when no live object has that handle.
  * @see https://www.php.net/spl_object_id
  * @since 4.8.1
  */
@@ -826,21 +834,24 @@ function swoole_timer_after(int $ms, callable $callback, ...$params): int|false
  *
  * Execution time of the callback function does not affect the next trigger time. In the following example, the
  * timer is set to trigger every 10 ms, and the callback function takes 5 ms to execute. The timer is triggered at
- * 0.000 s for the first time, and finishes at 0.005 s. The next one will be triggered at 0.010 s, but not 0.015 s.
- *
- *     Swoole\Timer::tick(10, function() { // Triggered every 10 ms.
- *         // Assuming the callback function takes 5 ms to execute.
- *     });
+ * 0.000 s for the first time, and finishes at 0.005 s. The next one will be triggered at 0.010 s, but not 0.015 s,
+ * e.g.,
+ * ```php
+ * swoole_timer_tick(10, function () { // Triggered every 10 ms.
+ *     // Assuming the callback function takes 5 ms to execute.
+ * });
+ * ```
  *
  * The actual time between the timer being scheduled and the timer being executed may be longer than the specified
  * interval. A timer may be skipped if the callback function takes too long to execute; in this case, the timer will
  * be triggered again at the next interval. In the following example, the timer is set to trigger every 10 ms, and
  * the callback function takes 12 ms to execute. The timer is triggered at 0.000 s for the first time, and finishes
- * at 0.012 s. The one scheduled at 0.010 s will be skipped, and the next one will be triggered at 0.020 s.
- *
- *     Swoole\Timer::tick(10, function() { // Triggered every 10 ms.
- *         // Assuming the callback function takes 12 ms to execute.
- *     });
+ * at 0.012 s. The one scheduled at 0.010 s will be skipped, and the next one will be triggered at 0.020 s, e.g.,
+ * ```php
+ * swoole_timer_tick(10, function () { // Triggered every 10 ms.
+ *     // Assuming the callback function takes 12 ms to execute.
+ * });
+ * ```
  *
  * @param int $ms The timer interval in milliseconds. It must be no less than SWOOLE_TIMER_MIN_MS (1 millisecond).
  * @param callable $callback The callback function to be executed when the timer interval has elapsed. The timer ID is
@@ -882,7 +893,10 @@ function swoole_timer_exists(int $timer_id): bool
  *   - removed (boolean): Whether the timer has been removed.
  *
  * @param int $timer_id Timer ID returned by \Swoole\Timer::tick() or \Swoole\Timer::after().
- * @return array|null Returns an array of timer information, or null if the timer does not exist.
+ * @return array|null Returns an array of timer information, or null if the timer does not exist. Despite the return
+ *                    type declared, FALSE is returned at run time when no timer has been created in the current
+ *                    process (or thread) yet. The type declared here matches the one the extension itself declares,
+ *                    i.e., the mismatch is in Swoole, not in this stub.
  * @alias This function is an alias of method \Swoole\Timer::info().
  * @see \Swoole\Timer::info()
  */
@@ -1120,13 +1134,17 @@ function swoole_native_curl_multi_errno(CurlMultiHandle $multi_handle): int
  * This function is available only when Swoole is installed with option "--enable-swoole-curl" included. Don't use this
  * function directly; always use the corresponding PHP's cURL function instead.
  *
+ * Note: this stub used to declare parameter $still_running with a native type, as "int &$still_running"; the
+ * parameter has always been untyped in the Swoole extension itself, matching PHP's own curl_multi_exec(), so a
+ * variable that hasn't been assigned yet can be passed in.
+ *
  * @param CurlMultiHandle $multi_handle The cURL multi handle.
  * @param int $still_running Set to the number of transfers that are still running.
  * @return int Returns 0 (CURLM_OK) on success, or one of the CURLM_* error codes on failure.
  * @see curl_multi_exec()
  * @see https://www.php.net/curl_multi_exec
  */
-function swoole_native_curl_multi_exec(CurlMultiHandle $multi_handle, int &$still_running): int
+function swoole_native_curl_multi_exec(CurlMultiHandle $multi_handle, &$still_running): int
 {
 }
 
@@ -1331,10 +1349,11 @@ function swoole_native_curl_upkeep(CurlHandle $handle): bool
  * experimental feature that swoole-cli turns on by default.
  *
  * The module lets you call methods directly on plain PHP values — strings, arrays, and stream resources — instead of
- * going through the matching str_*() or array_*() function, e.g.:
- *
- *     $text = 'Hello Swoole';
- *     echo $text->lower()->replace('swoole', 'php'); // "hello php"
+ * going through the matching str_*() or array_*() function, e.g.,
+ * ```php
+ * $text = 'Hello Swoole';
+ * echo $text->lower()->replace('swoole', 'php'); // "hello php"
+ * ```
  *
  * Most of those methods simply forward to the PHP function of the same purpose. A handful of them, however, need the
  * value being operated on to come first in the argument list, which is not how the corresponding PHP function is

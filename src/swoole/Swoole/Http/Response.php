@@ -8,8 +8,19 @@ use Swoole\Coroutine\Socket;
 use Swoole\WebSocket\Frame;
 
 /**
- * The HTTP Response class.
+ * The HTTP response to send back to the client of a Swoole HTTP server.
  *
+ * Objects of this class are created by Swoole and passed to the "Request" event callback of a \Swoole\Http\Server
+ * (or \Swoole\WebSocket\Server), or to a handler registered through method \Swoole\Coroutine\Http\Server::handle(),
+ * together with the \Swoole\Http\Request object being answered. Use methods like status(), header(), and cookie() to
+ * build the response, then finish it with method end() (or stream it with write(), or serve a file with sendfile()).
+ * A response can be finished once only; after that, method isWritable() returns FALSE.
+ *
+ * A Response object served by a coroutine HTTP server can also be upgraded to a WebSocket connection (methods
+ * upgrade(), push(), and recv()), and a connection can be handed over elsewhere with methods detach() and create().
+ *
+ * @see \Swoole\Http\Request
+ * @see \Swoole\Http\Server
  * @not-serializable Objects of this class cannot be serialized.
  */
 class Response
@@ -590,7 +601,7 @@ class Response
      * @return Frame|string|false
      *                            Returns a \Swoole\WebSocket\Frame object when succeeds.
      *                            Returns an empty string when the HTTP connection is closed.
-     *                            Returns FALSE when error happens. Use method \swoole_last_error() to get error code.
+     *                            Returns FALSE when error happens. Use function \swoole_last_error() to get error code.
      * @see \Swoole\Constant::OPTION_SOCKET_READ_TIMEOUT
      * @see \Swoole\WebSocket\Frame
      * @see \swoole_last_error()

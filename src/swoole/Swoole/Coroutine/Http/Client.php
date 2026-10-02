@@ -373,7 +373,9 @@ class Client
      * their getter methods).
      *
      * When setting "max_retries" is set to a positive value, a response with status code 502 or 503 makes the client
-     * close the connection and retry the request transparently, at most that many extra times.
+     * close the connection and retry the request transparently, at most that many extra times; if the last attempt
+     * still gets a 502 or 503 response, the request is treated as failed and FALSE is returned. The same setting also
+     * makes the client retry a failed connection attempt up to that many extra times.
      *
      * @param string $path The path (plus optional query string) to request, e.g., "/index.php?a=b".
      * @return bool Return TRUE on success; return FALSE when the request fails — check properties $errCode, $errMsg,
