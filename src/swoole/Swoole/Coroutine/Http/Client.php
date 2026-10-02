@@ -287,13 +287,14 @@ class Client
     /**
      * Set the username and password for HTTP basic authentication.
      *
-     * The credentials are sent with every request afterwards, in header "Authorization".
+     * The credentials are sent with every request afterwards, in header "Authorization". The password is marked as a
+     * sensitive parameter, so its value is hidden from stack traces (e.g., in uncaught exceptions and error logs).
      *
      * @param string $username The username.
      * @param string $password The password.
      * @since 4.4.0
      */
-    public function setBasicAuth(string $username, string $password): void
+    public function setBasicAuth(string $username, #[\SensitiveParameter] string $password): void
     {
     }
 

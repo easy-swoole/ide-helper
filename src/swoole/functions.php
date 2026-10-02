@@ -704,13 +704,16 @@ function swoole_event_dispatch(): bool
  *
  * This function works similarly to statement setTimeout(callback, 0) in JavaScript.
  *
+ * Swoole itself declares the return type as bool (that's what reflection reports), but the function never returns
+ * false, so the stub declares it as true.
+ *
  * @param callable $callback The callback to be executed.
- * @return true This method always returns true.
+ * @return true This function always returns true.
  * @alias This function is an alias of method \Swoole\Event::defer().
  * @see \Swoole\Event::defer()
  * @see \swoole_timer_after() Add a timer that only runs once after the specified number of milliseconds.
  */
-function swoole_event_defer(callable $callback): bool
+function swoole_event_defer(callable $callback): true
 {
 }
 
@@ -1308,9 +1311,9 @@ function swoole_native_curl_unescape(CurlHandle $handle, string $string): string
 /**
  * The coroutine version of PHP's cURL function curl_upkeep().
  *
- * This function is available only when PHP is 8.2 or above, Swoole is installed with option "--enable-swoole-curl"
- * included, and libcurl is 7.62.0 or above. Before Swoole 6.1.3, it required PHP 8.4 or above. Don't use this function
- * directly; always use the corresponding PHP's cURL function instead.
+ * This function is available only when Swoole is installed with option "--enable-swoole-curl" included and libcurl is
+ * 7.62.0 or above. Before Swoole 6.1.3, it required PHP 8.4 or above. Don't use this function directly; always use the
+ * corresponding PHP's cURL function instead.
  *
  * @param CurlHandle $handle The cURL handle.
  * @return bool Returns true on success, or false on failure.

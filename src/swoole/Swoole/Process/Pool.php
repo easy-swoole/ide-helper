@@ -337,7 +337,7 @@ class Pool
      * @see \Swoole\Process\Pool::on()
      * @see \Swoole\Process\Pool::shutdown()
      */
-    public function start()
+    public function start(): ?false
     {
     }
 
