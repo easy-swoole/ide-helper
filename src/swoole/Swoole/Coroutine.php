@@ -209,10 +209,13 @@ class Coroutine
      *
      * This method must be called inside a coroutine, and the limit applies to the calling coroutine only.
      *
-     * @param float $timeout The time limit in seconds. Although the parameter accepts a float, as of Swoole 6.2.0 the
+     * @param float $timeout The time limit in seconds. Although the parameter accepts a float, as of Swoole 6.2.3 the
      *                       fractional part is dropped internally, so the limit is effectively whole seconds (e.g.,
-     *                       1.5 behaves like 1). When 0 is given, no limit is set and FALSE is returned.
-     * @return bool Returns TRUE when the time limit is set, or FALSE when $timeout is 0.
+     *                       1.5 behaves like 1). When 0 is given, no limit is set and FALSE is returned. Any other
+     *                       value below 1 (e.g., 0.5, or a negative number) doesn't set a limit either: a warning is
+     *                       raised, yet TRUE is returned.
+     * @return bool Returns TRUE when the time limit is set (and, as described for parameter $timeout, also when a
+     *              value below 1 other than 0 is given, although no limit is set then), or FALSE when $timeout is 0.
      * @see \Swoole\Coroutine\TimeoutException
      * @see \Swoole\Coroutine::cancel()
      * @since 6.2.0

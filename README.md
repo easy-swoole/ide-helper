@@ -131,7 +131,7 @@ what it needs. For example:
   `SWOOLE_HOOK_PDO_SQLITE`, `SWOOLE_HOOK_PDO_FIREBIRD`): `--enable-swoole-pgsql`, `--with-swoole-odbc`,
   `--with-swoole-oracle`, `--enable-swoole-sqlite`, and `--with-swoole-firebird` respectively.
 * Running file operations through io_uring (a Linux facility for asynchronous I/O), and the `SWOOLE_IOURING_*`
-  constants: `--enable-iouring`.
+  constants: `--enable-iouring` (or `--with-liburing-dir`).
 * The experimental "stdext" module (calling methods directly on plain strings, arrays, and streams, plus functions
   such as `swoole_typed_array()`): `--enable-swoole-stdext`.
 

@@ -132,7 +132,9 @@ class Server extends \Swoole\Http\Server
      *                     frame), or FALSE when the data isn't a complete, well-formed WebSocket frame. Since Swoole
      *                     6.2.3, a control frame (close, ping, or pong) with the compression flag
      *                     SWOOLE_WEBSOCKET_FLAG_RSV1 set counts as malformed too, since control frames must never be
-     *                     compressed.
+     *                     compressed. Swoole itself declares the return type as \Swoole\WebSocket\Frame (that's what
+     *                     reflection reports), but the method does return FALSE in these cases, so the stub declares
+     *                     it as Frame|false.
      * @see \Swoole\WebSocket\Server::pack()
      * @see \Swoole\WebSocket\Frame::unpack()
      * @see \Swoole\WebSocket\CloseFrame
