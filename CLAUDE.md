@@ -180,10 +180,38 @@ conventions consistently — they are what every existing file already follows a
   not thrown anywhere by Swoole" in `Swoole\Client\Exception`, or the "as of Swoole 6.2.2, is never updated by"
   notes on `Swoole\Coroutine\Http2\Client`'s properties): these are assertions about one particular release, so a
   version bump makes every one of them stale until it's re-checked. When bringing the stubs up to date, grep for
-  the previously supported version number across `src/swoole/` and, for each hit, re-verify the claim against the
-  new release's source before re-anchoring it to the new version — if the claim no longer holds, rewrite it rather
-  than moving the version number onto a statement that has since become false. This is distinct from prose that
+  the previously supported version number across `src/swoole/` and `README.md` and, for each hit, re-verify the
+  claim against the new release's source before re-anchoring it to the new version — if the claim no longer holds,
+  rewrite it rather than moving the version number onto a statement that has since become false. This is distinct from prose that
   deliberately records history (e.g. "Before Swoole 6.2.1, such a path made the method fail with FALSE returned",
   as used in `Swoole\Coroutine\System`), which stays pinned to the version where the behavior actually changed and
   must *not* be bumped.
 - After editing, run the coding style and syntax check commands above before committing.
+
+## README maintenance
+
+`README.md` is mostly hand-written prose, but a few parts of it are derived from swoole-src or from the version this
+branch supports, and go stale on a release exactly like the "as of Swoole X.Y.Z" prose in the stubs. The two
+largest are wrapped in HTML comment markers (`<!-- BEGIN: version-examples -->` … `<!-- END: version-examples -->`
+and `<!-- BEGIN: ini-directives -->` … `<!-- END: ini-directives -->`) to show where automated updates belong:
+
+- **Version examples** (inside the `version-examples` markers, e.g. "version `X.Y.Z` of this package documents
+  Swoole `vX.Y.Z`", `composer require --dev swoole/ide-helper:~X.Y.Z`, "currently `X.Y.x`"; plus the `vX.Y.Z` tag
+  example in the "Contributing" section): must name the version the current branch supports (`SWOOLE_VERSION` in
+  `src/swoole/constants.php`). On a maintenance branch (e.g. `6.1.x`), that's the branch's own line, not master's.
+- **PHP configuration settings** (inside the `ini-directives` markers): must match the `PHP_INI_BEGIN()` …
+  `PHP_INI_END()` block in `ext-src/php_swoole.cc` at that release's tag — every directive listed (none extra, none
+  missing), with its real type, default, and where it can be set (`PHP_INI_ALL` = anywhere; `PHP_INI_SYSTEM` =
+  `php.ini` only), and the "(as of Swoole X.Y.Z)" note naming the version it was verified against. Describe each
+  directive in plain language for a PHP developer, like a stub docblock; don't state a default you can't trace to
+  source.
+- **"What's included" and "Features that depend on build options"**: must still describe what's under `src/` and the
+  build-option-gated features documented in the stubs. Update them only when a top-level file or directory is added,
+  removed, or changes role, or when a build option is added, removed, or renamed.
+
+Everything else in `README.md` (intro, installation, requirements, IDE setup, best practices, docblock conventions,
+contributing, badges) is hand-written: don't rewrite it as part of a stub update or review, and keep edits inside
+the derived parts to what the source actually requires — add, remove, or rename entries and fix facts, rather than
+rewording entries that are still correct. When bringing the stubs up to date with a release, re-verify the derived
+parts above against the new tag in full (not just the diff since the previous release — the README has drifted
+before); when a deep review finds them wrong for the currently supported version, fix them.

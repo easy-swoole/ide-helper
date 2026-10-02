@@ -5,7 +5,8 @@ description: >
   Swoole release, e.g. "publish the 6.1.0 release" or "tag and release 6.0.3". Give it the target version in this
   project's own format (no "v" prefix, e.g. "6.1.0"). This performs real, public, irreversible actions — it creates
   and pushes a git tag, and publishes a live GitHub release — so only run it once the corresponding stub changes have
-  already been prepared (e.g. via the prepare-swoole-release agent) and are committed on the branch that owns that
+  already been prepared (e.g. via the prepare-swoole-release agent, including README.md's version-derived parts per
+  CLAUDE.md's "README maintenance" section) and are committed on the branch that owns that
   release line (mainline releases from `master`, patch releases for an older line from that line's own branch, e.g.
   `6.1.x`). It never marks a release as a pre-release, and never marks it as this project's "latest" release. This
   is for project maintainers
@@ -140,6 +141,19 @@ was blank, and don't reorder the checks so a fail-open one runs before check 1.
      stop and tell the user to push first. If local is behind, stop and tell the user to pull first.
    - `src/swoole/constants.php`'s `SWOOLE_VERSION`, `SWOOLE_MAJOR_VERSION`, `SWOOLE_MINOR_VERSION`, and
      `SWOOLE_RELEASE_VERSION` at HEAD actually match the target version.
+   - `README.md` at HEAD names the target version in both of its version-derived spots (see CLAUDE.md's "README
+     maintenance" section): the version-examples sentence and the ini directive list's "as of" note.
+     ```bash
+     TARGET_VERSION=6.1.0 # substitute the version you were given
+     grep -nF "version \`${TARGET_VERSION}\` of this package documents Swoole \`v${TARGET_VERSION}\`" README.md
+     grep -nF "(as of Swoole ${TARGET_VERSION})" README.md
+     ```
+     Both must print a line. This is a hard stop, not a warning: the tag freezes `README.md` as it appears on GitHub
+     and Packagist for that release, and a stale version example can't be corrected without cutting another release,
+     whereas fixing it now is just a commit and a push. These checks fail closed on an empty version (the patterns
+     then no longer match the real text). Check only these version strings — validating the ini list itself against
+     swoole-src is `prepare-swoole-release`'s job, not this skill's. No special casing is needed on a maintenance
+     branch: its README should name its own line's version, which is exactly what `TARGET_VERSION` is there.
    If any check fails, stop and explain what's missing — most likely the stub changes for this version haven't
    been prepared/merged yet (that's `prepare-swoole-release`'s job, run beforehand).
 

@@ -5,9 +5,9 @@ description: >
   "prepare stubs for Swoole 6.1.0" or "bring the ide-helper stubs up to date with Swoole 6.0.3". Give it the target
   Swoole version. It diffs swoole-src between the version this project currently supports and the target version,
   updates only the stubs affected by that diff, wholesale-replaces src/swoole_library/ from the matching
-  swoole/library release, and leaves the result as a local commit. It does not perform a full repo-wide audit (use a
-  dedicated deep-review agent for that) and it does not tag or publish a release (use the swoole-ide-helper-release
-  skill for that).
+  swoole/library release, brings README.md's version-derived parts up to date, and leaves the result as a local
+  commit. It does not perform a full repo-wide audit (use a dedicated deep-review agent for that) and it does not tag
+  or publish a release (use the swoole-ide-helper-release skill for that).
 tools: Bash, Read, Edit, Write, Grep, Glob, WebFetch, Task, TodoWrite
 ---
 
@@ -187,6 +187,26 @@ sub-tasks (via the Task tool) per file or logical group — but do your own fina
 surprising or high-stakes (a claimed behavior change, a new failure mode, a type change) by reading the actual
 swoole-src source yourself before reporting it as fact. Don't just relay a sub-task's claim uncritically.
 
+# Step 4b: bring README.md up to date
+
+Follow CLAUDE.md's "README maintenance" section — re-read it fresh, like the stub conventions. In short:
+
+1. **Version examples.** Grep `README.md` for the previously supported version (`CURRENT_VERSION`, with and without
+   the "v" prefix, and the `X.Y.x` minor line if the minor changed) and bump each hit inside the
+   `version-examples` markers, plus the tag example in "Contributing", to the target version.
+2. **ini directives.** Extract the `PHP_INI_BEGIN()` … `PHP_INI_END()` block from `ext-src/php_swoole.cc` at
+   `vTARGET_VERSION` (already fetched in Step 1) and compare every directive's name, type, default (follow macros
+   such as `SW_SOCKET_BUFFER_SIZE` to their definition), and scope against the table and descriptions inside the
+   `ini-directives` markers. Compare the whole list, not just what the Step 1 diff shows — drift that predates this
+   release still needs fixing. Add, remove, or rename entries as needed, write plain-language descriptions for new
+   ones (read the code that uses the directive, don't guess), and bump the "(as of Swoole X.Y.Z)" note.
+3. **Inventory.** If Step 3 added or removed a top-level file under `src/swoole/`, changed how `src/swoole_library/`
+   is shipped, or added/removed/renamed a build option, update "What's included" / "Features that depend on build
+   options" to match.
+
+Do not rewrite any other part of `README.md`, and do not reword entries that are still correct. If nothing needed
+to change, say so explicitly in the commit body and report rather than staying silent.
+
 # Step 5: verify before you're done
 
 Run this repo's own CI-equivalent checks and fix anything they flag. Take the exact commands from CLAUDE.md's
@@ -208,8 +228,9 @@ Match this repo's existing commit style, which `git log` will show you: a short 
 `updates for Swoole X.Y.Z`) followed by a blank line and a real body. The body is not optional here — existing
 release and review commits explain, per area, what changed and what it was verified against, and that write-up is
 the main record of why each stub edit was made. Cover the version bump, the notable stub changes grouped by
-class/area, the `src/swoole_library/` replacement, and confirmation that the style and syntax checks pass. Wrap the
-body at the width `git log` already shows in this repo. Follow whatever trailer convention the recent commits use.
+class/area, the `src/swoole_library/` replacement, what changed in `README.md` (or that its derived parts were
+verified and needed no change), and confirmation that the style and syntax checks pass. Wrap the body at the width
+`git log` already shows in this repo. Follow whatever trailer convention the recent commits use.
 
 Do not create a git tag and do not push to any remote — those are out of scope for this agent. Note that your tool
 access does not mechanically prevent either one (you have `Bash`), so this is a rule you have to hold to yourself:
@@ -221,5 +242,5 @@ irreversible, public change out of what is supposed to be a reviewable local com
 Summarize: the current → target version bump, which files you touched and why (tie each back to a specific
 swoole-src change), the version constants you bumped, confirmation that `src/swoole_library/` was replaced from the
 matching `swoole/library` release (with the file list taken from that release's own `src/__init__.php` manifest),
-confirmation that the style/syntax checks passed, and the branch/commit you left the work on. Flag anything you
-couldn't fully verify rather than guessing.
+what changed in `README.md` (or that it was verified and needed no change), confirmation that the style/syntax checks
+passed, and the branch/commit you left the work on. Flag anything you couldn't fully verify rather than guessing.

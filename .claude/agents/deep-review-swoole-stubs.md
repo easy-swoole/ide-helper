@@ -28,9 +28,12 @@ signature, and — above everything else — writing for a PHP developer, not a 
 re-read it each session rather than relying on memory of a prior run, since new conventions get added to it over
 time; the recap here is a reminder of what's in that section, never a substitute for reading it.
 
-**Scope: `src/swoole/` only** (`constants.php`, `functions.php`, `shortnames.php`, `Swoole/**`). Do not touch
-`src/swoole_library/` — that's a verbatim copy of real PHP source synced by wholesale replacement, not a stub, and
-is out of scope for this kind of symbol-by-symbol review.
+**Scope: `src/swoole/`** (`constants.php`, `functions.php`, `shortnames.php`, `Swoole/**`), **plus the derived
+parts of `README.md`** listed in CLAUDE.md's "README maintenance" section (version examples, the ini directive list,
+the inventory of included files and build-option-gated features) — check those against the same swoole-src tag and
+fix factual errors there, but never rewrite README's hand-written prose. Do not touch `src/swoole_library/` — that's
+a verbatim copy of real PHP source synced by wholesale replacement, not a stub, and is out of scope for this kind of
+symbol-by-symbol review.
 
 # Step 0: pin down the version to review against
 
@@ -92,6 +95,9 @@ because a later tier looks more interesting):
    (ZTS-gated), `Async/Client.php`, and the various `*/Exception.php` classes not already covered above
    (`Coroutine/Curl/Exception.php`, `Coroutine/Http/Client/Exception.php`, `Coroutine/Http2/Client/Exception.php`,
    `Client/Exception.php`, `Coroutine/Socket/Exception.php`).
+6. **`README.md`** (derived parts only, per CLAUDE.md's "README maintenance" section): the version examples, the
+   ini directive table and descriptions (against the `PHP_INI_BEGIN()` … `PHP_INI_END()` block in
+   `ext-src/php_swoole.cc`), and the "What's included" / "Features that depend on build options" inventory.
 
 Update the progress file as you go, not just at the end — if you get interrupted, the file on disk should always
 reflect real completed state.
@@ -238,16 +244,11 @@ When you do run a team, the sub-agents all share this one working tree, so parti
 # Step 5: verify before you stop (whether or not you finished the whole list)
 
 Run this repo's own CI-equivalent checks and fix anything they flag before wrapping up a session, even a partial
-one:
-```bash
-docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.5-alpine php-cs-fixer fix --dry-run
-docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.1-alpine phplint src
-```
-If `php-cs-fixer` reports anything, re-run it without `--dry-run` to apply the fixes, then re-run the dry run to
-confirm it comes back clean:
-```bash
-docker run -q --rm -v "$(pwd):/project" -w /project -i jakzal/phpqa:php8.5-alpine php-cs-fixer fix
-```
+one. Take the exact commands from CLAUDE.md's "Commands" section rather than from memory or from a copy here — that
+section is the single source of truth for them. You need three of them: the coding-style dry run, the coding-style
+auto-fix (for anything the dry run flags; re-run the dry run afterward to confirm it comes back clean), and the
+syntax check.
+
 `phplint` has no auto-fix — anything it flags is a real syntax error you have to fix by hand (most often an
 8.2+-only type declaration that needs to go back to an 8.1-compatible one).
 
@@ -256,7 +257,6 @@ is 8.1, and PHP's parser is backward-permissive (an 8.2+-only construct like a s
 under 8.5 but fails under 8.1), so 8.1 is the only version whose parser actually enforces the "inline type
 declarations must be valid PHP 8.1 syntax" convention. CI runs this same check against 8.1 through 8.5 (see
 `.github/workflows/syntax_checks.yml`); 8.1 is the binding one for this purpose.
-(Check CLAUDE.md's "Commands" section in case the exact versions/commands have since changed.)
 
 Commit your changes locally on whatever branch is currently checked out. **Never create a branch and never switch
 branches** — not for a solo session, not for a team session, not "just to keep this separate." That has gone wrong
@@ -265,7 +265,8 @@ before; if you think the work belongs somewhere else, say so in your report and 
 Before committing, check `git status` and commit only what you actually changed:
 
 - Run `git status` at the *start* of a session too, and note anything already modified in the working tree that
-  isn't yours. Stage files explicitly (`git add src/swoole/...`) rather than `git commit -a` / `git add -A`, so
+  isn't yours. Stage files explicitly (`git add src/swoole/...`, plus `git add README.md` if you fixed it) rather
+  than `git commit -a` / `git add -A`, so
   pre-existing unrelated edits don't get swept into your commit.
 - `temp/` is gitignored, but double-check `temp/deep-review-progress.md` never appears in the commit.
 - Confirm nothing under `src/swoole_library/` is staged — it's out of scope, so a change there means something went
