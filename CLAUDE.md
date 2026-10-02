@@ -5,15 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 This package provides IDE helper ("stub") files for [Swoole](https://github.com/swoole/swoole-src), the PHP
-coroutine/async C extension. It contains no executable logic of its own — every method body is empty. The sole
-purpose of each file is to give IDEs (PhpStorm, VS Code, etc.) accurate autocompletion, type hints, and inline
-documentation for classes/functions/constants that are actually implemented in C by the Swoole extension (and, for
-one subtree, in the companion `swoole/library` PHP package).
+coroutine/async C extension. It contains no executable logic of its own — method bodies are empty, apart from a few
+that hold explanatory pseudocode (see the `@pseudocode-included` convention below). The sole purpose of each file is
+to give IDEs (PhpStorm, VS Code, etc.) accurate autocompletion, type hints, and inline documentation for
+classes/functions/constants that are actually implemented in C by the Swoole extension (and, for one subtree, in the
+companion `swoole/library` PHP package).
 
 There are two distinct kinds of source under `src/`, and they are maintained very differently:
 
 - `src/swoole/` — pure stubs for the Swoole C extension. Every class/method/function here mirrors a symbol exported
-  by the extension. Method/function bodies are always empty (`{ }`); all information lives in PHPDoc blocks.
+  by the extension. Method/function bodies are empty (`{ }`), except for the few that carry `@pseudocode-included`
+  explanatory code; all information lives in PHPDoc blocks.
 - `src/swoole_library/` — a verbatim copy of the PHP userland source from https://github.com/swoole/library (the
   `swoole/library` package that ships inside the Swoole extension via `swoole.enable_library`). This is real,
   runnable PHP code, not stubs. It gets updated by copying files over from that upstream repo, not by hand-editing
